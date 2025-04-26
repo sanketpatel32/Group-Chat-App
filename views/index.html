@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Chat App</title>
+    <script src="/js/login.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <h1>Welcome to the group chat app</h1>
+    <form onsubmit="handleUserSignup(event)">
+      <!-- For Sign up, take the name, email, phone number, password from the user -->
+
+      <label for="name">Name:</label><br />
+      <input type="text" id="name" name="name" required /><br /><br />
+      <label for="email">Email:</label><br />
+      <input type="email" id="email" name="email" required /><br /><br />
+      <label for="phoneNumber">Phone Number:</label><br />
+      <input type="tel" id="phoneNumber" name="phoneNumber" required /><br /><br />
+      <label for="password">Password:</label><br />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+      /><br /><br />
+
+      <button type="submit">Submit</button>
+      <p id="signupError" class="error-msg"></p>
+    </form>
+  </body>
+</html>
