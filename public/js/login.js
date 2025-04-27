@@ -1,46 +1,39 @@
-const baseurl = "http://localhost:3000/api"; // Base URL for API requests
+const baseurl = "http://localhost:3000/api"; 
 
-const handleUserSignup = async (event) => {
+const handleUserLogin = async (event) => {
     event.preventDefault();
-    const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
-    const phoneNumber = document.getElementById("phoneNumber").value.trim();
     const password = document.getElementById("password").value.trim();
-    const signupError = document.getElementById("signupError");
+    const loginError = document.getElementById("loginError");
 
     // Clear previous error message
-    signupError.textContent = "";
-
-    const user = {
-        name: name,
-        email: email,
-        password: password,
-        phoneNumber: phoneNumber,
-    };
-    console.log("DEbugging"); // Log the user object for debugging
-    console.log(user); // Log the user object for debugging
+    loginError.textContent = "";
 
     try {
-        const response = await axios.post(`${baseurl}/user/signup`, user);
-        if (response.status === 201) {
-            console.log("User created successfully");
+        const response = await axios.post(`${baseurl}/user/login`, { email, password });
+
+        if (response.status === 200) {
             const { token } = response.data; // Get JWT token
             localStorage.setItem("token", token); // Store JWT in local storage
-
-            window.location.href = "/expense"; // Redirect to the expense page
+            window.location.href = "/api/dashboard"; // Redirect to the home page
         }
     } catch (error) {
         if (error.response) {
-            if (error.response.status === 409) {
-                signupError.textContent = "Signup failed: User already exists.";
+            if (error.response.status === 404) {
+                loginError.textContent = "User not found. Please check your email.";
+            } else if (error.response.status === 401) {
+                loginError.textContent = "Incorrect password. Please try again.";
             } else if (error.response.status === 500) {
-                signupError.textContent = "Server error. Please try again later.";
+                loginError.textContent = "Server error. Please try again later.";
             } else {
-                signupError.textContent = error.response.data.message || "An unexpected error occurred.";
+                loginError.textContent = error.response.data.error || "An unexpected error occurred.";
             }
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+            loginError.textContent = "Unable to connect to the server. Please try again later.";
         } else {
-            console.error("Error signing up user:", error);
-            signupError.textContent = "An unexpected error occurred. Please try again.";
+            console.error("Error logging in:", error.message);
+            loginError.textContent = "An unexpected error occurred. Please try again.";
         }
     }
 };

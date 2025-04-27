@@ -14,7 +14,7 @@ const fs = require('fs');
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({credentials: true})); // Adjust the origin as needed
 app.use('/api', routes);
 
 // Serve static files from the public directory
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 
-sequelize.sync({force : true}) // Set force to true only for development/testing purposes
+sequelize.sync({force : false}) // Set force to true only for development/testing purposes
 .then(() => {
   app.listen(process.env.PORT || 3000, () => {
     console.log(`Example app listening on port ${process.env.PORT}`);
