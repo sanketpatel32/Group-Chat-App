@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.header {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ccc;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.chatarea {
+    flex: 1; /* Takes up all available space */
+    overflow-y: auto; /* Allows scrolling for chat messages */
+    padding: 10px;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+}
+
+.chatarea ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sender {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-top: 1px solid #ccc;
+}
+
+.sender-form {
+    display: flex;
+    width: 100%;
+    gap: 10px; /* Adds space between input and button */
+}
+
+.sender-form input {
+    flex: 1; /* Input takes up most of the space */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.sender-form button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sender-form button:hover {
+    background-color: #0056b3;
+}
