@@ -75,3 +75,36 @@ body {
 .sender-form button:hover {
     background-color: #0056b3;
 }
+
+/* Style for the chat container */
+.chatarea ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chatarea ul li {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+/* Style for the current user's messages */
+.my-message {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+    text-align: right;
+    margin-left: auto;
+}
+
+/* Style for other users' messages */
+.other-message {
+    background-color: #f1f1f1;
+    color: black;
+    align-self: flex-start;
+    text-align: left;
+    margin-right: auto;
+}
