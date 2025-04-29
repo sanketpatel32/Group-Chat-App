@@ -73,4 +73,5 @@ const getChatHandler = async () => {
 // Ensure the script is executed only once
 document.addEventListener("DOMContentLoaded", () => {
     getChatHandler();
+    setInterval(getChatHandler, 1000); 
 });
