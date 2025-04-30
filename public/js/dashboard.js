@@ -34,44 +34,49 @@ const submitChatHandler = async (event) => {
 // Function to fetch and populate the chat container with messages
 const getChatHandler = async () => {
     try {
-        // Fetch all chats from the server
-        const response = await axios.get(`${baseurl}/chat/getAll`, {
-            headers: { Authorization: `Bearer ${token}` }, // Include token for authentication
+        let storedChats = JSON.parse(localStorage.getItem("recentChats")) || [];
+        const lastMessageId = storedChats.length ? storedChats[storedChats.length - 1].id : 0;
+
+        const response = await axios.get(`${baseurl}/chat/getNew?lastMessageId=${lastMessageId}`, {
+            headers: { Authorization: `Bearer ${token}` }
         });
 
-        const chats = response.data.chats; // Extract chats from the response
-        const chatList = document.getElementById("allChat");
-
-        // Clear the chat container before populating
-        chatList.innerHTML = "";
-
-        // Get the current user's ID (assuming it's stored in the token or elsewhere)
+        const newChats = response.data.chats;
         const currentUserId = response.data.currentUserId;
 
-        // Populate the chat container with messages
-        chats.forEach((chat) => {
+        // Merge and deduplicate chats
+        const mergedChats = [...storedChats, ...newChats];
+        const uniqueChats = Array.from(new Map(mergedChats.map(c => [c.id, c])).values()).slice(-10);
+
+        localStorage.setItem("recentChats", JSON.stringify(uniqueChats));
+
+        // Render chats
+        const chatList = document.getElementById("allChat");
+        chatList.innerHTML = "";
+        uniqueChats.forEach(chat => {
             const li = document.createElement("li");
-            li.textContent = `${chat.user.name}: ${chat.message}`; // Display user name and message
-
-            // Add a class to differentiate between current user's messages and others
-            if (chat.user.id === currentUserId) {
-                li.classList.add("my-message");
-            } else {
-                li.classList.add("other-message");
-            }
-
+            li.textContent = `${chat.user.name}: ${chat.message}`;
+            li.classList.add(chat.user.id === currentUserId ? "my-message" : "other-message");
             chatList.appendChild(li);
         });
-
-        // Scroll to the bottom of the chat container
         chatList.scrollTop = chatList.scrollHeight;
     } catch (error) {
-        console.error("Error fetching chats:", error);
-        alert("Failed to load chats. Please try again.");
+        console.error("Error fetching new chats:", error);
     }
 };
+
 // Ensure the script is executed only once
 document.addEventListener("DOMContentLoaded", () => {
-    getChatHandler();
-    setInterval(getChatHandler, 1000); 
+    const localChats = JSON.parse(localStorage.getItem("recentChats")) || [];
+    const chatList = document.getElementById("allChat");
+
+    localChats.forEach(chat => {
+        const li = document.createElement("li");
+        li.textContent = `${chat.user.name}: ${chat.message}`;
+        li.classList.add("other-message"); // Use dummy class until real userId fetched
+        chatList.appendChild(li);
+    });
+
+    getChatHandler(); // Fetch newer messages
+    setInterval(getChatHandler, 1000);
 });

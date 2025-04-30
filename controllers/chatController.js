@@ -1,5 +1,6 @@
 const userModel = require("../models/userModel");
 const chatModel = require("../models/chatModel");
+const { Op } = require("sequelize");
 
 const receiveChat = async (req, res) => {
     const userId = req.user.userId; 
@@ -37,7 +38,34 @@ const getChat = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+const getNewChats = async (req, res) => {
+    const lastMessageId = parseInt(req.query.lastMessageId) || 0;
+
+    try {
+        const chats = await chatModel.findAll({
+            where: {
+                id: { [Op.gt]: lastMessageId }, // Only chats with ID > lastMessageId
+            },
+            include: [
+                {
+                    model: userModel,
+                    attributes: ['id', 'name'],
+                },
+            ],
+            order: [['createdAt', 'ASC']],
+        });
+
+        const currentUserId = req.user.userId;
+        res.status(200).json({ status: "Success", chats, currentUserId });
+    } catch (error) {
+        console.error("Error fetching new chats:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 module.exports = {
     receiveChat,
-    getChat
+    getChat,
+    getNewChats,
 };
