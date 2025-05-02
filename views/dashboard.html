@@ -8,27 +8,58 @@
   </head>
   <body>
     <div class="container">
-      <div class="header">
+      <header class="header">
         Welcome to Chat App
-      </div>
-      <div class="chatarea">
-        <ul id="allChat"></ul>
-      </div>
-      <div class="sender">
-        <form class="sender-form" onsubmit="submitChatHandler(event)">
-          <input
-            type="text"
-            id="message"
-            name="message"
-            placeholder="Type your message here..."
-            required
-          />
-          <button type="submit">Send</button>
-        </form>
-      </div>
+      </header>
+      <main class="main-content">
+        <!-- Sidebar for groups -->
+        <aside class="sidebar">
+          <h3>Groups</h3>
+          <ul id="groupList">
+            <!-- Groups will be dynamically added here -->
+          </ul>
+          <form id="addUserForm" onsubmit="addUserHandler(event)">
+            <input
+              type="email"
+              id="userEmail"
+              name="userEmail"
+              placeholder="Enter user email"
+              required
+            />
+            <button type="submit">Add User</button>
+          </form>
+          <form id="addGroupForm" onsubmit="addGroupHandler(event)">
+            <input
+              type="text"
+              id="groupName"
+              name="groupName"
+              placeholder="Enter group name"
+              required
+            />
+            <button type="submit">Add Group</button>
+          </form>
+        </aside>
+        <!-- Chat area -->
+        <section class="chat-container">
+          <div class="chatarea">
+            <ul id="allChat"></ul>
+          </div>
+          <div class="sender">
+            <form class="sender-form" onsubmit="submitChatHandler(event)">
+              <input
+                type="text"
+                id="message"
+                name="message"
+                placeholder="Type your message here..."
+                required
+              />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        </section>
+      </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/dashboard.js"></script>
   </body>
-  
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="/js/dashboard.js"></script>
 </html>
