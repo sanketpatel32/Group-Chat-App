@@ -6,6 +6,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #e9f7ef; /* Light green background like WhatsApp */
 }
 
 .container {
@@ -21,10 +22,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #ccc;
+    background-color: #075e54; /* WhatsApp green */
+    color: white;
     font-size: 24px;
     font-weight: bold;
+    text-align: center;
+    padding: 10px;
 }
 
 /* Main content styles */
@@ -35,66 +38,101 @@ body {
 
 /* Sidebar styles */
 .sidebar {
-    width: 25%; /* Sidebar takes 25% of the width */
-    background-color: #f4f4f4;
+    width: 30%; /* Sidebar takes 30% of the width */
+    background-color: #ffffff; /* White background for sidebar */
     border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
     padding: 10px;
-    overflow-y: auto; /* Scrollable if content overflows */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Prevent overflow */
 }
 
 .sidebar h3 {
     margin: 0;
-    padding: 10px 0;
+    padding: 5px 0;
     font-size: 18px;
+    color: #075e54; /* WhatsApp green */
     border-bottom: 1px solid #ccc;
 }
 
+/* Scrollable group list */
+#groupList {
+    flex: 1; /* Takes up available space */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto; /* Makes the group list scrollable */
+}
+
 .sidebar ul li {
-    padding: 10px;
+    padding: 8px;
     margin: 5px 0;
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: #f8f9fa; /* Light gray background for groups */
+    border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
-    color: black; /* Default text color */
+    color: #333; /* Dark text */
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .sidebar ul li:hover {
-    background-color: #007bff;
-    color: white;
+    background-color: #d4f3e2; /* Light green hover effect */
+    color: #075e54; /* WhatsApp green text */
 }
 
 .selected-group {
-    background-color: #007bff; /* Blue background */
-    color: white; /* White text */
+    background-color: #d4f3e2; /* Light green */
+    color: #075e54; /* WhatsApp green */
     font-weight: bold;
-    border: 1px solid #0056b3; /* Optional: Add a border for better visibility */
+    border: 1px solid #075e54;
 }
-/* Add group form styles */
-#addGroupForm {
+
+/* Form styles */
+form {
     margin-top: 10px;
     display: flex;
     flex-direction: column;
 }
 
-#addGroupForm input {
+form input {
     padding: 8px;
     margin-bottom: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
 }
 
-#addGroupForm button {
+form button {
     padding: 8px;
-    background-color: #007bff;
+    background-color: #25d366; /* WhatsApp green button */
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
-#addGroupForm button:hover {
-    background-color: #0056b3;
+form button:hover {
+    background-color: #1da851; /* Darker green on hover */
+}
+
+/* Search section at the bottom */
+#searchUserForm {
+    margin-top: auto; /* Push the search form to the bottom */
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+#searchResults {
+    max-height: 150px; /* Limit the height of search results */
+    overflow-y: auto; /* Make search results scrollable */
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #ffffff;
 }
 
 /* Chat container styles */
@@ -102,13 +140,14 @@ body {
     flex: 1; /* Takes the remaining width */
     display: flex;
     flex-direction: column;
+    background-color: #e9f7ef; /* Light green background */
 }
 
 .chatarea {
     flex: 1; /* Takes up all available space */
     overflow-y: auto; /* Allows scrolling for chat messages */
     padding: 10px;
-    background-color: #fff;
+    background-color: #ffffff; /* White background for chat area */
     border-bottom: 1px solid #ccc;
 }
 
@@ -124,12 +163,13 @@ body {
     border-radius: 8px;
     max-width: 70%;
     word-wrap: break-word;
+    font-size: 14px;
 }
 
 /* Style for the current user's messages */
 .my-message {
-    background-color: #007bff;
-    color: white;
+    background-color: #dcf8c6; /* Light green for sent messages */
+    color: black;
     align-self: flex-end;
     text-align: right;
     margin-left: auto;
@@ -137,11 +177,12 @@ body {
 
 /* Style for other users' messages */
 .other-message {
-    background-color: #f1f1f1;
+    background-color: #ffffff; /* White for received messages */
     color: black;
     align-self: flex-start;
     text-align: left;
     margin-right: auto;
+    border: 1px solid #ddd;
 }
 
 /* Sender form styles */
@@ -150,7 +191,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px;
-    background-color: #f4f4f4;
+    background-color: #ffffff; /* White background for sender */
     border-top: 1px solid #ccc;
 }
 
@@ -171,39 +212,14 @@ body {
 .sender-form button {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #25d366; /* WhatsApp green button */
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .sender-form button:hover {
-    background-color: #0056b3;
-}
-
-#addUserForm {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-}
-
-#addUserForm input {
-    padding: 8px;
-    margin-bottom: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#addUserForm button {
-    padding: 8px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#addUserForm button:hover {
-    background-color: #218838;
+    background-color: #1da851; /* Darker green on hover */
 }

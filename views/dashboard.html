@@ -9,26 +9,17 @@
   <body>
     <div class="container">
       <header class="header">
-        Welcome to Chat App
+        <h1>Chat App</h1>
       </header>
       <main class="main-content">
         <!-- Sidebar for groups -->
         <aside class="sidebar">
           <h3>Groups</h3>
-          <ul id="groupList">
+          <ul id="groupList" aria-label="Group List">
             <!-- Groups will be dynamically added here -->
           </ul>
-          <form id="addUserForm" onsubmit="addUserHandler(event)">
-            <input
-              type="email"
-              id="userEmail"
-              name="userEmail"
-              placeholder="Enter user email"
-              required
-            />
-            <button type="submit">Add User</button>
-          </form>
           <form id="addGroupForm" onsubmit="addGroupHandler(event)">
+            <label for="groupName" class="form-label">Create New Group</label>
             <input
               type="text"
               id="groupName"
@@ -38,11 +29,27 @@
             />
             <button type="submit">Add Group</button>
           </form>
+          <form id="searchUserForm" onsubmit="searchUsersHandler(event)">
+            <label for="searchQuery" class="form-label">Search Users</label>
+            <input
+              type="text"
+              id="searchQuery"
+              name="searchQuery"
+              placeholder="Search by name, email, or phone"
+              required
+            />
+            <button type="submit">Search</button>
+          </form>
+          <div id="searchResults" class="search-results">
+            <!-- Search results will be dynamically added here -->
+          </div>
         </aside>
-        <!-- Chat area -->
+        <!-- Chat and members area -->
         <section class="chat-container">
           <div class="chatarea">
-            <ul id="allChat"></ul>
+            <ul id="allChat" aria-live="polite">
+              <!-- Chat messages will be dynamically added here -->
+            </ul>
           </div>
           <div class="sender">
             <form class="sender-form" onsubmit="submitChatHandler(event)">

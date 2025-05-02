@@ -28,6 +28,10 @@ const GroupUser = sequelize.define('groupUser', {
         },
         onDelete: 'CASCADE',
     },
+    isAdmin: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+    },
 });
 
 module.exports = GroupUser;

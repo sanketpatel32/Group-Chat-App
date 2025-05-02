@@ -12,5 +12,6 @@ router.get('/login', (req, res) => {
 });
 router.post('/signup', userController.handleUserSignup);
 router.post('/login', userController.handleUserLogin);
+router.get('/search', userController.searchUsers); // Search for users
 
 module.exports = router;

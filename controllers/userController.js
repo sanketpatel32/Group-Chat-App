@@ -2,7 +2,7 @@ const userModel = require('../models/userModel'); // Adjust the path as necessar
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
+const Sequelize = require('sequelize'); // Import Sequelize for using Op
 const handleUserSignup = async (req, res) => {
     const { name, email, password,phoneNumber } = req.body;
 
@@ -55,7 +55,30 @@ const handleUserLogin = async (req, res) => {
 };
 
 
+const searchUsers = async (req, res) => {
+    const { query } = req.query; // Get the search query from the request
+
+    try {
+        // Search for users by name, email, or phone number
+        const users = await userModel.findAll({
+            where: {
+                [Sequelize.Op.or]: [
+                    { name: { [Sequelize.Op.like]: `%${query}%` } },
+                    { email: { [Sequelize.Op.like]: `%${query}%` } },
+                    { phoneNumber: { [Sequelize.Op.like]: `%${query}%` } },
+                ],
+            },
+            attributes: ['id', 'name', 'email', 'phoneNumber'], // Return only relevant fields
+        });
+
+        res.status(200).json({ status: "Success", users });
+    } catch (error) {
+        console.error("Error searching for users:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 
 
 
-module.exports = { handleUserLogin, handleUserSignup };
+
+module.exports = { handleUserLogin, handleUserSignup ,searchUsers};
