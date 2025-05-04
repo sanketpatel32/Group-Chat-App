@@ -53,16 +53,22 @@
           </div>
           <div class="sender">
             <form class="sender-form" onsubmit="submitChatHandler(event)">
-              <input
-                type="text"
-                id="message"
-                name="message"
-                placeholder="Type your message here..."
-                required
-              />
-              <button type="submit">Send</button>
+                <input
+                    type="text"
+                    id="message"
+                    name="message"
+                    placeholder="Type your message here..."
+                    required
+                />
+                <input
+                    type="file"
+                    id="fileInput"
+                    name="file"
+                    style="margin-left: 10px;"
+                />
+                <button type="submit">Send</button>
             </form>
-          </div>
+        </div>
         </section>
       </main>
     </div>

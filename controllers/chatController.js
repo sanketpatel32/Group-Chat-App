@@ -2,6 +2,8 @@ const userModel = require("../models/userModel");
 const chatModel = require("../models/chatModel");
 const groupModel = require("../models/groupModel"); // Import the group model
 const { Op } = require("sequelize");
+const { uploadToS3 } = require("../services/aws");
+
 
 // Function to receive and save a chat message
 const receiveChat = async (req, res) => {
@@ -92,8 +94,71 @@ const getNewChats = async (req, res) => {
     }
 };
 
+// Function to handle file uploads
+const uploadFile = async (req, res) => {
+    const userId = req.user.userId; // Get the userId from the authenticated user
+    const groupId = req.body.groupId; // Get the groupId from the request body
+    const file = req.file; // The uploaded file
+
+    if (!file || !groupId) {
+        return res.status(400).json({ error: "File and groupId are required" });
+    }
+
+    try {
+        // Upload the file to S3
+        const fileUrl = await uploadToS3(file.buffer, file.originalname);
+
+        // Save the file metadata in the database
+        const chat = await chatModel.create({
+            message: `File: ${file.originalname}`,
+            userId: userId,
+            groupId: groupId,
+            fileUrl: fileUrl, // Save the file URL
+        });
+
+        // Fetch the user's name
+        const user = await userModel.findOne({
+            where: { id: userId },
+            attributes: ["id", "name"],
+        });
+
+        // Emit the file message to the group via Socket.IO
+        if (req.io) {
+            req.io.to(groupId).emit("receiveMessage", {
+                groupId,
+                message: `File: ${file.originalname}`,
+                fileUrl: fileUrl,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                },
+            });
+        }
+
+        res.status(200).json({
+            status: "File uploaded successfully",
+            chat: {
+                id: chat.id,
+                message: chat.message,
+                groupId: chat.groupId,
+                fileUrl: chat.fileUrl,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                },
+                createdAt: chat.createdAt,
+            },
+        });
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+    }
+};
+
+
 module.exports = {
     receiveChat,
     getChat,
     getNewChats,
+    uploadFile, // Export the new function
 };

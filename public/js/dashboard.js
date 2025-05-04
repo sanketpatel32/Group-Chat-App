@@ -12,9 +12,11 @@ const submitChatHandler = async (event) => {
     event.preventDefault();
 
     const message = document.getElementById("message").value.trim();
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0]; // Get the selected file
 
-    if (!message) {
-        alert("Message cannot be empty!");
+    if (!message && !file) {
+        alert("Message or file is required!");
         return;
     }
 
@@ -24,23 +26,43 @@ const submitChatHandler = async (event) => {
     }
 
     try {
-        // Save the message to the database via the backend API
-        const response = await axios.post(
-            `${baseurl}/chat/send`,
-            { message, groupId: selectedGroupId },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
+        let savedMessage;
 
-        const savedMessage = response.data.chat; // The saved chat message from the backend
+        if (file) {
+            // If a file is selected, upload it
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("groupId", selectedGroupId);
+
+            const response = await axios.post(`${baseurl}/chat/uploadFile`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            savedMessage = response.data.chat; // The saved file message from the backend
+        } else {
+            // If no file, send a text message
+            const response = await axios.post(
+                `${baseurl}/chat/send`,
+                { message, groupId: selectedGroupId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            savedMessage = response.data.chat; // The saved chat message from the backend
+        }
 
         // Emit the message to the server via Socket.IO for real-time updates
         socket.emit("sendMessage", {
             groupId: selectedGroupId,
             message: savedMessage.message,
+            fileUrl: savedMessage.fileUrl || null, // Include file URL if available
             user: savedMessage.user, // Use the user data returned from the backend
         });
 
         document.getElementById("message").value = ""; // Clear input
+        fileInput.value = ""; // Clear file input
     } catch (error) {
         console.error("Error sending message:", error);
         alert("Failed to send message. Please try again.");
@@ -63,7 +85,20 @@ const getChatHandler = async (groupId) => {
 
         chats.forEach((chat) => {
             const li = document.createElement("li");
-            li.textContent = `${chat.user.name}: ${chat.message}`;
+
+            if (chat.fileUrl) {
+                // If the message is a file, display it as an image or link
+                li.innerHTML = `
+                    <strong>${chat.user.name}:</strong>
+                    <a href="${chat.fileUrl}" target="_blank">
+                        <img src="${chat.fileUrl}" alt="Shared File" style="max-width: 200px; max-height: 200px; border-radius: 8px;" />
+                    </a>
+                `;
+            } else {
+                // If the message is text, display it normally
+                li.textContent = `${chat.user.name}: ${chat.message}`;
+            }
+
             li.classList.add(chat.user.id === currentUserId ? "my-message" : "other-message");
             chatList.appendChild(li);
         });
@@ -80,13 +115,25 @@ socket.on("receiveMessage", (data) => {
     if (data.groupId === selectedGroupId) {
         const chatList = document.getElementById("allChat");
         const li = document.createElement("li");
-        li.textContent = `${data.user.name}: ${data.message}`;
+
+        if (data.fileUrl) {
+            // If the message is a file, display it as an image or link
+            li.innerHTML = `
+                <strong>${data.user.name}:</strong>
+                <a href="${data.fileUrl}" target="_blank">
+                    <img src="${data.fileUrl}" alt="Shared File" style="max-width: 200px; max-height: 200px; border-radius: 8px;" />
+                </a>
+            `;
+        } else {
+            // If the message is text, display it normally
+            li.textContent = `${data.user.name}: ${data.message}`;
+        }
+
         li.classList.add(data.user.id === currentUserId ? "my-message" : "other-message");
         chatList.appendChild(li);
         chatList.scrollTop = chatList.scrollHeight; // Scroll to the bottom
     }
 });
-
 // Function to handle adding a new group
 const addGroupHandler = async (event) => {
     event.preventDefault();

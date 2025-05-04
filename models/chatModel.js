@@ -14,6 +14,10 @@ const Chat = sequelize.define('chat', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    fileUrl: { // Add the fileUrl field
+        type: Sequelize.STRING,
+        allowNull: true, // Allow null for text-only messages
+    },
     userId: { // Foreign key
         type: Sequelize.INTEGER,
         allowNull: false,

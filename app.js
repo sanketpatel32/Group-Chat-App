@@ -10,6 +10,7 @@ const sequelize = require('./utils/database');
 require('dotenv').config();
 const fs = require('fs');
 
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
