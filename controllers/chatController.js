@@ -9,19 +9,38 @@ const receiveChat = async (req, res) => {
     const { message, groupId } = req.body; // Include groupId in the request body
 
     try {
+        // Save the chat to the database
         const chat = await chatModel.create({
             message: message,
             userId: userId, // Use the userId from the decoded token
             groupId: groupId, // Save the groupId
         });
 
-        res.status(200).json({ status: "Message received", chat });
+        // Fetch the user's name from the userModel
+        const user = await userModel.findOne({
+            where: { id: userId },
+            attributes: ['id', 'name'], // Fetch only the id and name
+        });
+
+        // Include the user's name in the response
+        res.status(200).json({
+            status: "Message received",
+            chat: {
+                id: chat.id,
+                message: chat.message,
+                groupId: chat.groupId,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                },
+                createdAt: chat.createdAt,
+            },
+        });
     } catch (error) {
         console.error("Error saving chat:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 // Function to fetch all chats for a specific group
 const getChat = async (req, res) => {
     const { groupId } = req.query; // Get groupId from query parameters

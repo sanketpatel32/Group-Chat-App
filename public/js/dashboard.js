@@ -2,6 +2,10 @@ const baseurl = "http://localhost:3000/api";
 const token = localStorage.getItem("token");
 let selectedGroupId = null; // Track the currently selected group
 let isAdmin = false; // Track if the current user is an admin
+let currentUserId = null; // Track the current user's ID
+
+// Connect to the Socket.IO server
+const socket = io("http://localhost:3000"); // Replace with your server URL
 
 // Function to handle sending a chat message
 const submitChatHandler = async (event) => {
@@ -20,14 +24,23 @@ const submitChatHandler = async (event) => {
     }
 
     try {
-        await axios.post(
+        // Save the message to the database via the backend API
+        const response = await axios.post(
             `${baseurl}/chat/send`,
             { message, groupId: selectedGroupId },
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
+        const savedMessage = response.data.chat; // The saved chat message from the backend
+
+        // Emit the message to the server via Socket.IO for real-time updates
+        socket.emit("sendMessage", {
+            groupId: selectedGroupId,
+            message: savedMessage.message,
+            user: savedMessage.user, // Use the user data returned from the backend
+        });
+
         document.getElementById("message").value = ""; // Clear input
-        await getChatHandler(selectedGroupId); // Refresh chats
     } catch (error) {
         console.error("Error sending message:", error);
         alert("Failed to send message. Please try again.");
@@ -43,7 +56,7 @@ const getChatHandler = async (groupId) => {
         });
 
         const chats = response.data.chats;
-        const currentUserId = response.data.currentUserId;
+        currentUserId = response.data.currentUserId; // Assign currentUserId from the response
 
         const chatList = document.getElementById("allChat");
         chatList.innerHTML = ""; // Clear existing chats
@@ -61,6 +74,18 @@ const getChatHandler = async (groupId) => {
         alert("Failed to load chats. Please try again.");
     }
 };
+
+// Listen for real-time chat messages
+socket.on("receiveMessage", (data) => {
+    if (data.groupId === selectedGroupId) {
+        const chatList = document.getElementById("allChat");
+        const li = document.createElement("li");
+        li.textContent = `${data.user.name}: ${data.message}`;
+        li.classList.add(data.user.id === currentUserId ? "my-message" : "other-message");
+        chatList.appendChild(li);
+        chatList.scrollTop = chatList.scrollHeight; // Scroll to the bottom
+    }
+});
 
 // Function to handle adding a new group
 const addGroupHandler = async (event) => {
@@ -80,7 +105,7 @@ const addGroupHandler = async (event) => {
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        alert("Group created succesfully"); // Show success message
+        alert("Group created successfully"); // Show success message
         document.getElementById("groupName").value = ""; // Clear the input field
         await fetchGroups(); // Refresh the group list
     } catch (error) {
@@ -151,6 +176,7 @@ const addUserToGroup = async (email) => {
         alert(error.response?.data?.error || "Failed to add user. Please try again.");
     }
 };
+
 // Function to fetch and display groups in the sidebar
 const fetchGroups = async () => {
     try {
@@ -199,12 +225,14 @@ const selectGroup = async (groupId, groupElement) => {
     groupItems.forEach((item) => item.classList.remove("selected-group"));
     groupElement.classList.add("selected-group");
 
+    // Join the group room via Socket.IO
+    socket.emit("joinGroup", groupId);
+
     await getGroupMembers(groupId); // Fetch and display group members
     await getChatHandler(groupId); // Fetch and display chats
 };
 
 // Function to fetch and display group members
-
 const getGroupMembers = async (groupId) => {
     try {
         const response = await axios.get(`${baseurl}/groups/getGroupUsers/${groupId}`, {
@@ -216,18 +244,12 @@ const getGroupMembers = async (groupId) => {
         isAdmin = await axios.get(`${baseurl}/groups/isAdmin/${groupId}`, {
             headers: { Authorization: `Bearer ${token}` },
         }).then((res) => res.data.isAdmin); // Check if the current user is an admin
-        // Check if the current user is an admin
-
-        console.log("Is Admin:", isAdmin); // Debugging log
-        console.log("Members:", members); // Debugging log
 
         const memberList = document.getElementById(`group-${groupId}-members`);
         memberList.innerHTML = ""; // Clear existing members
 
         // Filter out the current user
         const filteredMembers = members.filter((member) => member.id !== currentUserId);
-
-        console.log("Filtered Members:", filteredMembers); // Debugging log
 
         // Display the filtered members
         filteredMembers.forEach((member) => {
@@ -255,6 +277,7 @@ const getGroupMembers = async (groupId) => {
         alert("Failed to load group members. Please try again.");
     }
 };
+
 // Function to remove a user from the group
 const removeUserFromGroup = async (userId) => {
     try {
@@ -292,11 +315,4 @@ const promoteToAdmin = async (userId) => {
 // Initialize the dashboard
 document.addEventListener("DOMContentLoaded", () => {
     fetchGroups();
-
-    // Periodically fetch chats for the selected group
-    setInterval(() => {
-        if (selectedGroupId) {
-            getChatHandler(selectedGroupId); // Pass the selected group ID
-        }
-    }, 5000);
 });
