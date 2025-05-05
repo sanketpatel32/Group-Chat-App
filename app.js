@@ -4,6 +4,8 @@ const cors = require('cors');
 const http = require('http'); // Import http module
 const { Server } = require('socket.io'); // Import Socket.IO
 const app = express();
+const archiveChats = require('./services/cron'); // Import the cron job for archiving chats
+archiveChats(); // Start the cron job
 const routes = require('./routes/indexRoutes');
 const sequelize = require('./utils/database');
 
